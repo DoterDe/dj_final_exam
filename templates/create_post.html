@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+    <h1 class="text-center">Create Post</h1> 
+
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <form method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+
+                            <div class="mb-3">
+                                <label for="id_title" class="form-label">Title</label>
+                                <input type="text" class="form-control" id="id_title" name="title" placeholder="Введите заголовок поста">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="id_image" class="form-label">Image</label>
+                                <input type="file" class="form-control" id="id_image" name="image" placeholder="Выберите изображение (необязательно)" onchange="previewImage(event)">
+                            </div>
+
+                            <div class="mb-3">
+                                <img id="imagePreview" src="" alt="No image selected" class="img-fluid" style="max-height: 300px; display: none;">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="id_content" class="form-label">Content</label>
+                                <textarea class="form-control" id="id_content" name="content" placeholder="Введите содержание поста" rows="6"></textarea>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary w-100">Create</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>  
+    </div>
+
+    <script>
+        function previewImage(event) {
+            const input = event.target;
+            const imagePreview = document.getElementById('imagePreview');
+
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+
+                reader.onload = function(e) {
+                    imagePreview.src = e.target.result;
+                    imagePreview.style.display = 'block';
+                }
+
+                reader.readAsDataURL(input.files[0]); 
+            } else {
+                imagePreview.style.display = 'none'; 
+            }
+        }
+    </script>
+
+{% endblock %}

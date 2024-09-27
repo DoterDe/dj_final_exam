@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="container_post">
+    <div class="container1">
+        <h1 class="post_list">Post List</h1>
+        {% for post in posts %}
+        <div class="post_com">
+            <div class="post" id="post-{{ post.id }}">
+
+                <div class="card">
+
+                    <div class="card-header">
+                        <h2>{{ post.title }}</h2>
+                    </div>
+
+                    {% if post.image %}
+                    <img src="{{ post.image.url }}" class="card-img-top img-fluid" alt="{{ post.title }}">
+                    {% endif %}
+
+                    <div>
+                        <form method="POST" action="{% url 'like_post' post.id %}" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="like-btn">
+                                {% if post.id in user_liked_post_ids %}
+                                    Unlike
+                                {% else %}
+                                    Like
+                                {% endif %}
+                            </button>
+                        </form>
+                        <span class="like-count">{{ post.get_like_count }} Likes</span>
+                    </div>
+
+                    <div class="card-body">
+                        <p>{{ post.content }}</p>
+                    </div>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        {{ form.content }}
+                        <input type="hidden" name="post_id" value="{{ post.id }}">
+                        <button type="submit">Submit</button>
+                    </form>
+
+                    <button class="toggle-comments-btn" data-post-id="{{ post.id }}">Show Comments</button>
+
+                </div>
+            </div>
+
+            <div class="comments-section" id="comments-{{ post.id }}" style="display: none;">
+                <h4>Comments:</h4>
+                {% for comment in post.comments.all %}
+                    <div class="comment">
+                        <div class="comment-author">
+                            {% if comment.author.avatar %}
+                                <img src="{{ comment.author.avatar.url }}" alt="{{ comment.author.username }}'s avatar" class="avatar" />
+                            {% else %}
+                                <img src="{% static 'img/sbcf-default-avatar.webp' %}" alt="Аватар по умолчанию" class="avatar" /> 
+                            {% endif %}
+                            <strong>{{ comment.author.username }}</strong>: {{ comment.content }}
+                        </div>
+
+                    </div>
+                {% empty %}
+                    <p>No comments yet.</p>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const likeButtons = document.querySelectorAll('.like-btn');
+
+    likeButtons.forEach(btn => {
+        btn.addEventListener('click', function(event) {
+            event.preventDefault();  
+
+            const postElement = this.closest('.post');  
+            const postId = postElement.id.split('-')[1];  
+            const likeCountElement = postElement.querySelector('.like-count');  
+            const currentLikes = parseInt(likeCountElement.innerText.split(' ')[0]);
+
+            if (this.innerText.trim() === 'Like') {
+                this.innerText = 'Unlike';
+                likeCountElement.innerText = `${currentLikes + 1} Likes`; 
+            } else {
+                this.innerText = 'Like';
+                likeCountElement.innerText = `${currentLikes - 1} Likes`; 
+            }
+
+            const form = this.closest('form');  
+            if (form) {
+                console.log('Form found for post ID:', postId);
+                form.submit();  
+            } else {
+                console.error('Form not found for post ID:', postId);
+            }
+        });
+    });
+
+    const commentToggleButtons = document.querySelectorAll('.toggle-comments-btn');
+    commentToggleButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const postId = this.getAttribute('data-post-id');
+            const commentsSection = document.getElementById(`comments-${postId}`);
+            if (commentsSection.style.display === 'none') {
+                commentsSection.style.display = 'block';
+                this.innerText = 'Hide Comments';  
+            } else {
+                commentsSection.style.display = 'none';
+                this.innerText = 'Show Comments';  
+            }
+        });
+    });
+});
+</script>
+
+{% endblock %}

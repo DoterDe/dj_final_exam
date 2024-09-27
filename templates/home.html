@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+    <h1>All Posts</h1>
+    
+    <div class="posts-list">
+        {% for post in posts %}
+        <div class="post" id="post-{{ post.id }}">
+            <div class="card">
+                <!-- Заголовок поста -->
+                <div class="card-header">
+                    <h2>{{ post.title }}</h2>
+                </div>
+
+                <!-- Изображение поста, если оно есть -->
+                {% if post.image %}
+                <img src="{{ post.image.url }}" class="card-img-top img-fluid" alt="{{ post.title }}">
+                {% endif %}
+
+                <!-- Текст поста -->
+                <div class="card-body">
+                    <p>{{ post.content }}</p>
+                </div>
+
+                <!-- Дата создания поста -->
+                <div class="card-footer">
+                    <small>Created at: {{ post.created_at }}</small>
+                </div>
+            </div>
+        </div>
+        <hr>
+        {% empty %}
+        <p>No posts available.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

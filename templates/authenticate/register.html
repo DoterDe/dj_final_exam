@@ -1,0 +1,33 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="{% static 'css/log_up.css' %}">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="avatar">Аватар</label>
+            <div class="avatar-container">
+                <img id="avatar-preview" src="{% static 'img/sbcf-default-avatar.webp' %}" alt="Avatar" class="avatar" />
+                <input type="file" name="avatar" id="avatar" class="custom-file-input" onchange="previewAvatar(event)" />
+                <label class="custom-file-label1" for="avatar">Изменить</label>
+            </div>
+            {{ form.first_name }}
+            {{ form.last_name }}
+            {{ form.phone_number }}
+            <button type="submit" class="btn btn-primary">Зарегистрироваться</button>
+        </div>
+    
+        
+        
+    </form>
+</body>
+</html>

@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block content %}
+    <h1>SUSLL1k</h1>
+    <h2>Posts</h2>
+    <div class="coments">
+        {% for review in reviews %}
+                <h4>{{ review.text }}</h4>
+        {% endfor %}
+        <form method="post">
+            {% csrf_token %}
+            <input type="text" name="text">
+            <input type="hidden" value="{{ post.id }}" name="post_id">
+            <button type="submit">Create</button>
+    
+        </form>
+    </div>
+{% endblock %}

@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+{% load static %}
+ 
+
+{% block content %}
+    <div id="edit-profile-modal" class="modal">
+    <div class="modal-content">
+        <h2>Changes</h2>
+        <span id="close-modal" class="close-btn">&times;</span>
+        <form id="edit-profile-form" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div id="form-messages"></div> <!-- Контейнер для сообщений -->
+            <div class="form-group">
+                <label for="avatar">Аватар</label>
+                <div class="avatar-container">
+                    <img id="avatar-preview" src="{{ profile.avatar.url }}" alt="Avatar" class="avatar" />
+                    <input type="file" name="avatar" id="avatar" class="custom-file-input" onchange="previewAvatar(event)" />
+                    <label class="custom-file-label1" for="avatar">Изменить</label>
+                </div>
+                {{ form.username }}
+                {{ form.first_name }}
+                {{ form.last_name }}
+                {{ form.email }}
+                {{ form.password1 }}
+                {{ form.phone_number }}
+                {{ form.password2 }}
+                {% if form.errors %}
+                    <div class="alert alert-danger">
+                        <ul>
+                            {% for field in form %}
+                                {% for error in field.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            {% endfor %}
+                            {% for error in form.non_field_errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+            </div>
+            
+            <button type="submit" class="btn btn-success">Save changes</button>
+        </form>
+    </div>
+    </div>
+    <div id="profile-info" class="container mt-4">
+        <h2 class="text-center">Profile of {{ profile.username }}</h2>
+        <div class="card1">
+            <div class="card-body text-center">
+                <h5 class="card-title">Avatar</h5>
+                <img class="rounded-circle mb-3" src="{{ profile.avatar.url }}" alt="Avatar" width="150">
+                <p class="card-text"><strong>Email:</strong> {{ profile.email }}</p>
+                <p class="card-text"><strong>Phone Number:</strong> {{ profile.phone_number }}</p>
+                <button id="edit-profile-btn" class="btn btn-primary mt-3">Edit Profile</button>
+            </div>
+        </div>
+    </div>
+    <div class="container_post">
+        <h1>Your Post's</h1>
+        {% for post in posts %}
+            <div class="post_com">
+                
+                <div class="post" id="post-{{ post.id }}">
+                
+                <div class="card">
+
+                    <div class="card-header">
+                        <h2>{{ post.title }}</h2>
+                    </div>
+
+                    {% if post.image %}
+                    <img src="{{ post.image.url }}" class="card-img-top img-fluid" alt="{{ post.title }}">
+                    {% endif %}
+
+                    <div>
+                        <span class="like-count">{{ post.get_like_count }} Likes</span>
+                    </div>
+
+                    <div class="card-body">
+                        <p>{{ post.content }}</p>
+                    </div>
+
+                    <button class="toggle-comments-btn" data-post-id="{{ post.id }}">Show Comments</button>
+
+                </div>
+                </div>
+                <div class="comments-section" id="comments-{{ post.id }}" style="display: none;">
+                <h4>Comments:</h4>
+                {% for comment in post.comments.all %}
+                    <div class="comment">
+                        <div class="comment-author">
+                            {% if comment.author.avatar %}
+                                <img src="{{ comment.author.avatar.url }}" alt="{{ comment.author.username }}'s avatar" class="avatar" />
+                            {% else %}
+                                <img src="{% static 'img/sbcf-default-avatar.webp' %}" alt="Аватар по умолчанию" class="avatar" /> 
+                            {% endif %}
+                            <strong>{{ comment.author.username }}</strong>: {{ comment.content }}
+                        </div>
+                    
+                    </div>
+                {% empty %}
+                    <p>No comments yet.</p>
+                {% endfor %}
+                </div>
+            </div>
+        {% endfor %}
+
+    <script>
+        document.getElementById('edit-profile-form').onsubmit = function(event) {
+            event.preventDefault(); 
+            let formData = new FormData(this);
+                
+            fetch("/profile/update/", {
+                method: 'POST',
+                body: formData,
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Обновите информацию профиля здесь, если это необходимо
+                    alert('Profile updated successfully!');
+                    // Закрываем модальное окно
+                    document.getElementById('edit-profile-modal').style.display = 'none';
+                } else {
+                    alert("Error updating profile");
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+            });
+        };
+      // Функция для открытия модального окна
+        document.getElementById('edit-profile-btn').onclick = function() {
+            document.getElementById('edit-profile-modal').style.display = 'block';
+        };
+
+        // Функция для закрытия модального окна
+        document.getElementById('close-modal').onclick = function() {
+            document.getElementById('edit-profile-modal').style.display = 'none';
+        };
+
+        // Закрытие модального окна при клике вне его
+        window.onclick = function(event) {
+            const modal = document.getElementById('edit-profile-modal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        };
+        const commentToggleButtons = document.querySelectorAll('.toggle-comments-btn');
+            commentToggleButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const postId = this.getAttribute('data-post-id');
+                    const commentsSection = document.getElementById(`comments-${postId}`);
+                    if (commentsSection.style.display === 'none') {
+                        commentsSection.style.display = 'block';
+                        this.innerText = 'Hide Comments';  
+                    } else {
+                        commentsSection.style.display = 'none';
+                        this.innerText = 'Show Comments';  
+                    }
+                });
+            });
+           
+    </script>
+{% endblock %}
+
