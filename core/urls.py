@@ -13,7 +13,7 @@ from django.contrib.staticfiles.views import serve
 from django.views.decorators.cache import never_cache
 from django.contrib.auth.views import LogoutView
 from core.settings import DEBUG
-from app.views import register_and_login_view ,logout_student , enter_confirmation_code, register, profile_view , profile_update_view , like_post , post_list
+from app.views import register_and_login_view ,logout_student , enter_confirmation_code, register, profile_view , profile_update_view , like_post , post_list , notification
 
 router = DefaultRouter()
 router.register('product', APIProductViewSet)

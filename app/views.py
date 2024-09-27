@@ -165,8 +165,19 @@ class CreatePost(LoginRequiredMixin, CreateView):
     form_class = CreatePostForm
 
     def form_valid(self, form):
-        form.instance.author = self.request.user  # Назначаем текущего пользователя автором
+        form.instance.author = self.request.user 
         return super().form_valid(form)
+
+@login_required
+def notification(request): 
+    username=request.user.username 
+    user=UserProfile1.objects.get(username=username) 
+ 
+    notification = list(user.likes_author.all()) + list(user.reviews_author.all()) 
+     
+    notification = sorted(notification, key=lambda x: x.created_at, reverse=True) 
+ 
+    return render(request, 'notification.html', {'notification': notification})
 
 @permission_classes((IsAuthenticated,))
 class APIProductViewSet(ModelViewSet):

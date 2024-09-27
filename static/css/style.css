@@ -130,7 +130,12 @@ form {
     flex-direction: column;
     gap: 15px;
 }
-
+.posts-list{
+    display: flex !important;
+    justify-content: center !important; 
+    align-items: center !important;
+    flex-direction: column;
+}
 textarea {
     width: 100%;
     padding: 10px;
